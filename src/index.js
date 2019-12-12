@@ -29,6 +29,11 @@ module.exports = class Reader extends Component {
     resolution: PropTypes.number,
     showViewFinder: PropTypes.bool,
     style: PropTypes.any,
+    innerShadow: PropTypes.shape({
+      colour: PropTypes.string,
+      width: PropTypes.string,
+      offset: PropTypes.string,
+    }),
     className: PropTypes.string,
     constraints: PropTypes.object
   };
@@ -37,6 +42,11 @@ module.exports = class Reader extends Component {
     resolution: 600,
     facingMode: 'environment',
     showViewFinder: true,
+    innerShadow: {
+      colour: 'rgba(255, 0, 0, 0.5)',
+      width: '5px',
+      offset: '50px',
+    },
     constraints: null
   };
 
@@ -102,7 +112,7 @@ module.exports = class Reader extends Component {
     }
   }
   shouldComponentUpdate(nextProps, nextState) {
-    if(nextState !== this.state){
+    if (nextState !== this.state) {
       return true
     }
 
@@ -146,10 +156,10 @@ module.exports = class Reader extends Component {
     }
     const constraints = {}
 
-    if(supported.facingMode) {
+    if (supported.facingMode) {
       constraints.facingMode = { ideal: facingMode }
     }
-    if(supported.frameRate) {
+    if (supported.frameRate) {
       constraints.frameRate = { ideal: 25, min: 10 }
     }
 
@@ -172,7 +182,7 @@ module.exports = class Reader extends Component {
     }
 
     // Handle different browser implementations of MediaStreams as src
-    if((preview || {}).srcObject !== undefined){
+    if ((preview || {}).srcObject !== undefined) {
       preview.srcObject = stream
     } else if (preview.mozSrcObject !== undefined) {
       preview.mozSrcObject = stream
@@ -201,7 +211,7 @@ module.exports = class Reader extends Component {
     const preview = this.els.preview
     preview.play()
 
-    if(typeof onLoad == 'function') {
+    if (typeof onLoad == 'function') {
       onLoad({ mirrorVideo, streamLabel })
     }
 
@@ -225,7 +235,7 @@ module.exports = class Reader extends Component {
     let vertOffset = 0
 
     // Scale image to correct resolution
-    if(legacyMode){
+    if (legacyMode) {
       // Keep image aspect ratio
       const greatestSize = width > height ? width : height
       const ratio = resolution / greatestSize
@@ -235,7 +245,7 @@ module.exports = class Reader extends Component {
 
       canvas.width = width
       canvas.height = height
-    }else{
+    } else {
       // Crop image to fit 1:1 aspect ratio
       const smallestSize = width < height ? width : height
       const ratio = resolution / smallestSize
@@ -284,7 +294,7 @@ module.exports = class Reader extends Component {
     // Reset componentDidUpdate
     this.componentDidUpdate = undefined
 
-    if(typeof this.props.onLoad == 'function') {
+    if (typeof this.props.onLoad == 'function') {
       this.props.onLoad()
     }
   }
@@ -312,6 +322,7 @@ module.exports = class Reader extends Component {
       onImageLoad,
       legacyMode,
       showViewFinder,
+      innerShadow,
       facingMode
     } = this.props
 
@@ -346,8 +357,8 @@ module.exports = class Reader extends Component {
       left: 0,
       zIndex: 1,
       boxSizing: 'border-box',
-      border: '50px solid rgba(0, 0, 0, 0.3)',
-      boxShadow: 'inset 0 0 0 5px rgba(255, 0, 0, 0.5)',
+      border: `${innerShadow.offset} solid rgba(0, 0, 0, 0.3)`,
+      boxShadow: `inset 0 0 0 ${innerShadow.width} ${innerShadow.colour}`,
       position: 'absolute',
       width: '100%',
       height: '100%',
@@ -358,8 +369,8 @@ module.exports = class Reader extends Component {
         <section style={containerStyle}>
           {
             (!legacyMode && showViewFinder)
-            ? <div style={viewFinderStyle} />
-            : null
+              ? <div style={viewFinderStyle} />
+              : null
           }
           {
             legacyMode
