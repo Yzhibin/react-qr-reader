@@ -30,10 +30,12 @@ module.exports = class Reader extends Component {
     showViewFinder: PropTypes.bool,
     style: PropTypes.any,
     innerShadow: PropTypes.shape({
-      colour: PropTypes.string,
-      width: PropTypes.string,
+      color: PropTypes.string,
+      lineColor: PropTypes.string,
+      lineWidth: PropTypes.string,
       offset: PropTypes.string,
     }),
+    borderRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     className: PropTypes.string,
     constraints: PropTypes.object
   };
@@ -43,10 +45,12 @@ module.exports = class Reader extends Component {
     facingMode: 'environment',
     showViewFinder: true,
     innerShadow: {
-      colour: 'rgba(255, 0, 0, 0.5)',
-      width: '5px',
+      color: 'rgba(0, 0, 0, 0.3)',
+      lineColor: 'rgba(255, 0, 0, 0.5)',
+      lineWidth: '5px',
       offset: '50px',
     },
+    borderRadius: 0,
     constraints: null
   };
 
@@ -323,6 +327,7 @@ module.exports = class Reader extends Component {
       legacyMode,
       showViewFinder,
       innerShadow,
+      borderRadius,
       facingMode
     } = this.props
 
@@ -357,8 +362,8 @@ module.exports = class Reader extends Component {
       left: 0,
       zIndex: 1,
       boxSizing: 'border-box',
-      border: `${innerShadow.offset} solid rgba(0, 0, 0, 0.3)`,
-      boxShadow: `inset 0 0 0 ${innerShadow.width} ${innerShadow.colour}`,
+      border: `${innerShadow.offset} solid ${innerShadow.color}`,
+      boxShadow: `inset 0 0 0 ${innerShadow.lineWidth} ${innerShadow.lineColor}`,
       position: 'absolute',
       width: '100%',
       height: '100%',
@@ -366,7 +371,7 @@ module.exports = class Reader extends Component {
 
     return (
       <section className={className} style={style}>
-        <section style={containerStyle}>
+        <section style={{ ...containerStyle, borderRadius }}>
           {
             (!legacyMode && showViewFinder)
               ? <div style={viewFinderStyle} />
